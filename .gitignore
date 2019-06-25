@@ -9,3 +9,4 @@ test*.js
 dist/
 node_modules/
 flow-typed
+mongodb
