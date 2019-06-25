@@ -1,0 +1,11 @@
+node_modules/
+proba*.*
+*.log
+*.swp
+*.swo
+*.idea
+.tern-port
+test*.js
+dist/
+node_modules/
+flow-typed
