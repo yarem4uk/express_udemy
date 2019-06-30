@@ -3,12 +3,13 @@ import { getDb } from '../util/database';
 
 export default class Product {
 
-  constructor(title, imageUrl, description, price, id) {
+  constructor(title, imageUrl, description, price, id, userId) {
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
     this.price = price;
     this._id = id ? new mongodb.ObjectId(id) : null;
+    this.userId = userId;
   }
 
   save() {
@@ -18,7 +19,7 @@ export default class Product {
       dbOp = db.collection('products')
         .updateOne({ _id: this._id }, { $set: this });
     } else {
-      dbOp = db.colleciton('products')
+      dbOp = db.collection('products')
         .insertOne(this);
     }
     return dbOp
