@@ -3,11 +3,9 @@ import Express from 'express';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 
-
 import shopRoutes from './routes/shop';
 import adminRouter from './routes/admin';
 import get404 from './controllers/error';
-
 
 export default () => {
 

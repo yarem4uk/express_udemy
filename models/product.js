@@ -1,78 +1,58 @@
-import fs from 'fs';
-import path from 'path';
-import rootDir from '../util/path';
-import Cart from './cart';
-
-
-const p = path.join(rootDir, 'data', 'products.json');
-
-const getProductsFromFile = cb => {
-  fs.readFile(p, 'utf8', (err, data) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(data));
-    }
-  });
-};
+import mongodb from 'mongodb';
+import { getDb } from '../util/database';
 
 export default class Product {
 
-  constructor(id, title, imageUrl, description, price) {
-    this.id = id;
+  constructor(title, imageUrl, description, price, id) {
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
     this.price = price;
+    this._id = id ? new mongodb.ObjectId(id) : null;
   }
 
   save() {
-    getProductsFromFile(products => {
-      if (this.id) {
-        console.log('hello from save method');
-        const existingProductIndex = products.findIndex(prod => prod.id === this.id);
-        const updatedProducts = [...products];
-        updatedProducts[existingProductIndex] = this;
-        fs.writeFile(p, JSON.stringify(updatedProducts), error => {
-          if (error) {
-            console.log(error);
-            throw error;
-          }
-        });
-      } else {
-        this.id = Math.random().toString();
-        products.push(this);
-        fs.writeFile(p, JSON.stringify(products), error => {
-          if (error) {
-            console.log(error);
-            throw error;
-          }
-        });
-      }
-    });
+    const db = getDb();
+    let dbOp;
+    if (this._id) {
+      dbOp = db.collection('products')
+        .updateOne({ _id: this._id }, { $set: this });
+    } else {
+      dbOp = db.colleciton('products')
+        .insertOne(this);
+    }
+    return dbOp
+      .then(result => result)
+      .catch(err => console.log(err));
+  }
+
+  static fetchAll() {
+    const db = getDb();
+    return db
+      .collection('products')
+      .find()
+      .toArray()
+      .then(products => products)
+      .catch(err => console.log(err));
+  }
+
+  static findById(prodId) {
+    const db = getDb();
+    return db
+      .collection('products')
+      .find({ _id: new mongodb.ObjectId(prodId) })
+      .next()
+      .then(product => product)
+      .catch(err => console.log(err));
   }
 
   static deleteById(prodId) {
-    Product.fetchAll(products => {
-      const product = products.find(item => item.id === prodId);
-      const updatedProducts = products.filter(item => item.id !== prodId);
-      fs.writeFile(p, JSON.stringify(updatedProducts), error => {
-        if (!error) {
-          Cart.deleteProduct(prodId, product.price);
-        }
-      });
-    });
-  }
-
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
-  }
-
-  static findById(id, cb) {
-    getProductsFromFile(products => {
-      const product = products.find(el => el.id === id);
-      cb(product);
-    });
+    const db = getDb();
+    return db
+      .collection('products')
+      .deleteOne({ _id: new mongodb.ObjectId(prodId) })
+      .then(result => result)
+      .catch(err => console.log(err));
   }
 
 }

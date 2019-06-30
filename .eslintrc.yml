@@ -39,6 +39,7 @@ rules:
   'arrow-parens':
     - error
     - as-needed
+  'no-underscore-dangle': 0
   'no-console': 0
   # comma-dangle:
     # - error
