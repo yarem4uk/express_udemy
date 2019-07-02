@@ -1,6 +1,4 @@
 import Product from '../models/product';
-import Cart from '../models/cart';
-
 
 const getIndex = (req, res, next) => {
   Product.fetchAll()
@@ -26,6 +24,19 @@ const getProducts = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
+const getCart = (req, res, nex) => {
+  req.user
+    .getCart()
+    .then(products => {
+      res.render('shop/cart', {
+        products,
+        pageTitle: 'Your cart',
+        path: '/cart',
+      });
+    })
+    .catch(err => console.log(err));
+};
+
 const getProduct = (req, res, next) => {
   const { productId } = req.params;
   Product.findById(productId)
@@ -37,41 +48,19 @@ const getProduct = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
-const getCart = (req, res, next) => {
-  Cart.getCart(cart => {
-    Product.fetchAll(product => {
-      const cartProducts = [];
-      product.map(el => {
-        const prod = cart.products.find(item => item.id === el.id);
-        if (prod) {
-          cartProducts.push({ productData: el, qty: prod.qty });
-        }
-      });
-      res.render('shop/cart', {
-        pageTitle: 'Your Cart',
-        path: '/cart',
-        products: cartProducts,
-      });
-    });
-  });
-};
-
 const postCart = (req, res, next) => {
   const { productId } = req.body;
-  Product.findById(productId, product => {
-    Cart.addProduct(productId, +product.price);
-  });
-  res.redirect('/cart');
+  Product.findById(productId)
+    .then(product => {
+      req.user.addToCart(product);
+    })
+    .then(() => {
+      console.log('Cart was updated!');
+      res.redirect('/cart');
+    })
+    .catch(err => console.log(err));
 };
 
-const postCartDeleteProduct = (req, res, next) => {
-  const { productId } = req.body;
-  Product.findById(productId, product => {
-    console.log(product);
-    Cart.deleteProduct(product.id, product.price);
-    res.redirect('/cart');
-  });
-};
 
 const getOrders = (req, res, next) => {
   res.render('shop/orders', {
@@ -93,7 +82,7 @@ export {
   getProduct,
   getCart,
   postCart,
-  postCartDeleteProduct,
+  // postCartDeleteProduct,
   getOrders,
   getCheckout,
 };
