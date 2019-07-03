@@ -62,11 +62,37 @@ const postCart = (req, res, next) => {
 };
 
 
+const postCartDeleteProduct = (req, res, next) => {
+  const { productId } = req.body;
+  req.user
+    .deleteItemFromCart(productId)
+    .then(resutl => {
+      console.log('deleted!');
+      res.redirect('/cart');
+    })
+    .catch(err => console.log(err));
+};
+
+const postOrder = (req, res, next) => {
+  req.user
+    .addOrder()
+    .then(result => {
+      res.redirect('/cart');
+    })
+    .catch(err => console.log(err));
+};
+
 const getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    pageTitle: 'Your Orders',
-    path: '/orders',
-  });
+  req.user
+    .fetchOrders()
+    .then(orders => {
+      res.render('shop/orders', {
+        orders,
+        pageTitle: 'Your Orders',
+        path: '/orders',
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 const getCheckout = (req, res, next) => {
@@ -82,7 +108,8 @@ export {
   getProduct,
   getCart,
   postCart,
-  // postCartDeleteProduct,
+  postCartDeleteProduct,
+  postOrder,
   getOrders,
   getCheckout,
 };

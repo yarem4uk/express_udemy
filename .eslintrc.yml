@@ -41,5 +41,6 @@ rules:
     - as-needed
   'no-underscore-dangle': 0
   'no-console': 0
+  'arrow-body-style': 0
   # comma-dangle:
     # - error
