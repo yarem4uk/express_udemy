@@ -19,9 +19,9 @@ export default () => {
   app.use('/assets', Express.static(path.join(__dirname, 'public')));
 
   app.use((req, res, next) => {
-    User.findUserById('5d18c73f1c9d44000029a927')
+    User.findById('5d1dda881e1df2260277152a')
       .then(user => {
-        req.user = new User(user.name, user.email, user.cart, user._id);
+        req.user = user;
         next();
       })
       .catch(err => console.log(err));
