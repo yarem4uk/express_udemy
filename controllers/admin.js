@@ -5,6 +5,7 @@ const getAddProduct = (req, res, next) => {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
     editing: false,
+    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -39,14 +40,12 @@ const postEditProduct = (req, res, next) => {
     description,
     productId,
   } = req.body;
-  console.log(req.body);
   Product.findById(productId)
     .then(product => {
       product.title = title;
       product.imageUrl = imageUrl;
       product.price = price;
       product.description = description;
-      console.log(product, 'this product');
       return product.save();
     })
     .then(result => {
@@ -72,6 +71,7 @@ const getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         editing: editMode,
         product,
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
@@ -93,6 +93,7 @@ const getProducts = (req, res, next) => {
         prods: products,
         pageTitle: 'Products',
         path: '/admin/products',
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));

@@ -9,6 +9,7 @@ const getIndex = (req, res, next) => {
         prods: products,
         pageTitle: 'Shop',
         path: '/',
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
@@ -22,12 +23,14 @@ const getProducts = (req, res, next) => {
         prods: products,
         pageTitle: 'All products',
         path: '/products',
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
 };
 
 const getCart = (req, res, nex) => {
+  console.log(req.user, 'user from session getCart');
   req.user
     .populate('cart.items.productId')
     .execPopulate()
@@ -36,6 +39,7 @@ const getCart = (req, res, nex) => {
         products: user.cart.items,
         pageTitle: 'Your cart',
         path: '/cart',
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
@@ -48,6 +52,7 @@ const getProduct = (req, res, next) => {
       product,
       pageTitle: product.title,
       path: '/products',
+      isAuthenticated: req.session.isLoggedIn,
     }))
     .catch(err => console.log(err));
 };
@@ -113,9 +118,10 @@ const getOrders = (req, res, next) => {
         orders,
         pageTitle: 'Your Orders',
         path: '/orders',
-      })
-        .catch(err => console.log(err));
-    });
+        isAuthenticated: req.session.isLoggedIn,
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 export {
