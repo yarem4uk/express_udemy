@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import connectMongoDBSession from 'connect-mongodb-session';
+import csrf from 'csurf';
+import flash from 'connect-flash';
 
 import shopRoutes from './routes/shop';
 import adminRoutes from './routes/admin';
@@ -19,12 +21,16 @@ const store = new MongoDBStore({
   colleciton: 'sessions',
 });
 
+const csrfProtection = csrf();
+
 export default () => {
 
   const app = new Express();
 
-  app.set('view engine', 'ejs');
+  // const logger = morgan(':method :status :url :response-time ms :res[content-length]');
+  // app.use(logger);
   app.use(morgan('dev'));
+  app.set('view engine', 'ejs');
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use('/assets', Express.static(path.join(__dirname, 'public')));
   app.use(session({
@@ -33,6 +39,9 @@ export default () => {
     saveUninitialized: false,
     store,
   }));
+
+  app.use(csrfProtection);
+  app.use(flash());
 
   app.use((req, res, next) => {
     if (!req.session.user) {
@@ -43,6 +52,12 @@ export default () => {
         req.user = user;
         next();
       });
+  });
+
+  app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
   });
 
   app.use('/admin', adminRoutes);

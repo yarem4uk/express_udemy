@@ -5,7 +5,7 @@ const getAddProduct = (req, res, next) => {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
     editing: false,
-    isAuthenticated: req.session.isLoggedIn,
+    // isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -42,15 +42,18 @@ const postEditProduct = (req, res, next) => {
   } = req.body;
   Product.findById(productId)
     .then(product => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/');
+      }
       product.title = title;
       product.imageUrl = imageUrl;
       product.price = price;
       product.description = description;
-      return product.save();
-    })
-    .then(result => {
-      console.log('Product Udated!');
-      res.redirect('/admin/products');
+      return product.save()
+        .then(result => {
+          console.log('Product Udated!');
+          res.redirect('/admin/products');
+        });
     })
     .catch(err => console.log(err));
 };
@@ -71,7 +74,7 @@ const getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         editing: editMode,
         product,
-        isAuthenticated: req.session.isLoggedIn,
+        // isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
@@ -79,7 +82,7 @@ const getEditProduct = (req, res, next) => {
 
 const postDeleteProduct = (req, res, next) => {
   const { productId } = req.body;
-  Product.findByIdAndRemove(productId)
+  Product.deleteOne({ _id: productId, userId: req.user._id })
     .then(resut => {
       res.redirect('/admin/products');
     })
@@ -87,7 +90,7 @@ const postDeleteProduct = (req, res, next) => {
 };
 
 const getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ userId: req.user._id })
     .then(products => {
       res.render('admin/products', {
         prods: products,

@@ -1,7 +1,6 @@
 import Product from '../models/product';
 import Order from '../models/order';
 
-
 const getIndex = (req, res, next) => {
   Product.find()
     .then(products => {
@@ -9,7 +8,7 @@ const getIndex = (req, res, next) => {
         prods: products,
         pageTitle: 'Shop',
         path: '/',
-        isAuthenticated: req.session.isLoggedIn,
+        // isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
@@ -23,7 +22,7 @@ const getProducts = (req, res, next) => {
         prods: products,
         pageTitle: 'All products',
         path: '/products',
-        isAuthenticated: req.session.isLoggedIn,
+        // isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
@@ -39,7 +38,7 @@ const getCart = (req, res, nex) => {
         products: user.cart.items,
         pageTitle: 'Your cart',
         path: '/cart',
-        isAuthenticated: req.session.isLoggedIn,
+        // isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
@@ -52,7 +51,7 @@ const getProduct = (req, res, next) => {
       product,
       pageTitle: product.title,
       path: '/products',
-      isAuthenticated: req.session.isLoggedIn,
+      // isAuthenticated: req.session.isLoggedIn,
     }))
     .catch(err => console.log(err));
 };
@@ -118,7 +117,7 @@ const getOrders = (req, res, next) => {
         orders,
         pageTitle: 'Your Orders',
         path: '/orders',
-        isAuthenticated: req.session.isLoggedIn,
+        // isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch(err => console.log(err));
