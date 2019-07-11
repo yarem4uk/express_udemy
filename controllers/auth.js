@@ -9,7 +9,7 @@ let resetUser;
 
 const transporter = nodemailer.createTransport(sendGrid({
   auth: {
-    api_key: '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',
+    api_key: '',
   },
 }));
 
